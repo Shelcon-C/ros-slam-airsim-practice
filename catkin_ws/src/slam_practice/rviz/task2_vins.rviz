@@ -1,0 +1,61 @@
+Panels:
+  - Class: rviz/Displays
+    Name: Displays
+  - Class: rviz/Views
+    Name: Views
+Visualization Manager:
+  Class: ""
+  Global Options:
+    Background Color: 35; 35; 35
+    Fixed Frame: world
+    Frame Rate: 30
+  Displays:
+    - Class: rviz/Grid
+      Name: Ground grid
+      Enabled: true
+      Plane: XY
+      Cell Size: 1
+      Color: 100; 100; 100
+    - Class: rviz/Path
+      Name: VINS path
+      Enabled: true
+      Topic: /slam_practice/vins/path
+      Color: 0; 255; 0
+      Line Style: Lines
+      Line Width: 0.03
+    - Class: rviz/Odometry
+      Name: VINS odometry
+      Enabled: true
+      Topic: /slam_practice/vins/odometry
+      Shape:
+        Color: 255; 85; 0
+        Axes Length: 0.5
+        Axes Radius: 0.05
+    - Class: rviz/PointCloud2
+      Name: VINS feature map
+      Enabled: true
+      Topic: /vins_estimator/point_cloud
+      Size (Pixels): 3
+      Style: Points
+    - Class: rviz/Image
+      Name: Left camera
+      Enabled: true
+      Image Topic: /vins_fusion/cam0/image_raw
+      Transport Hint: raw
+  Tools:
+    - Class: rviz/Interact
+    - Class: rviz/MoveCamera
+    - Class: rviz/Select
+  Views:
+    Current:
+      Class: rviz/Orbit
+      Distance: 12
+      Pitch: 0.55
+      Yaw: 0.78
+      Focal Point:
+        X: 0
+        Y: 0
+        Z: 0
+Window Geometry:
+  Width: 1280
+  Height: 800

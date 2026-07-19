@@ -1,0 +1,60 @@
+Panels:
+  - Class: rviz/Displays
+    Name: Displays
+  - Class: rviz/Tool Properties
+    Name: Tool Properties
+Visualization Manager:
+  Class: ""
+  Global Options:
+    Background Color: 35; 35; 35
+    Fixed Frame: world
+    Frame Rate: 30
+  Displays:
+    - Class: rviz/Grid
+      Name: Ground grid
+      Enabled: true
+      Plane: XY
+      Cell Size: 1
+    - Class: rviz/Path
+      Name: VINS path
+      Enabled: true
+      Topic: /slam_practice/vins/path
+      Color: 0; 255; 0
+      Line Width: 0.03
+    - Class: rviz/PointCloud2
+      Name: Occupancy map
+      Enabled: true
+      Topic: /grid_map/occupancy
+      Style: Boxes
+      Size (m): 0.1
+    - Class: rviz/Marker
+      Name: Planned trajectory
+      Enabled: true
+      Marker Topic: /planning_vis/trajectory
+    - Class: rviz/Image
+      Name: Planner depth
+      Enabled: true
+      Image Topic: /ego_bridge/depth
+      Transport Hint: raw
+  Tools:
+    - Class: rviz/Interact
+    - Class: rviz/MoveCamera
+    - Class: rviz/Select
+    - Class: rviz/SetGoal
+      Topic: /move_base_simple/goal
+  Views:
+    Current:
+      Class: rviz/Orbit
+      Distance: 14
+      Pitch: 0.6
+      Yaw: 0.8
+      Focal Point:
+        X: 0
+        Y: 0
+        Z: 1
+Window Geometry:
+  Width: 1440
+  Height: 900
+
+# EGO 输出消息接口，由 traj_server 发布；保留在配置中便于报告检索。
+# /planning/pos_cmd

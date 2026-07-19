@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>slam_practice</name>
+  <version>0.1.0</version>
+  <description>Dataset, evaluation, AirSim and planner bridge nodes for the ROS SLAM practice.</description>
+  <maintainer email="shelcon@example.com">Shelcon</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>camera_info_manager</depend>
+  <depend>cv_bridge</depend>
+  <depend>geometry_msgs</depend>
+  <depend>message_filters</depend>
+  <depend>nav_msgs</depend>
+  <depend>rospy</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>std_srvs</depend>
+  <depend>tf2_ros</depend>
+
+  <!-- 由 AirSim 与 EGO-Planner 源码工作空间提供。 -->
+  <exec_depend>airsim_ros_pkgs</exec_depend>
+  <exec_depend>quadrotor_msgs</exec_depend>
+  <exec_depend>python3-numpy</exec_depend>
+</package>

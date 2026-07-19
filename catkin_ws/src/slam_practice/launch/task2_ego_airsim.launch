@@ -1,0 +1,87 @@
+<launch>
+  <arg name="host" default="$(optenv WSL_HOST_IP 127.0.0.1)" />
+  <arg name="start_vio" default="true" />
+  <arg name="rviz" default="true" />
+  <arg name="map_size_x" default="40.0" />
+  <arg name="map_size_y" default="40.0" />
+  <arg name="map_size_z" default="5.0" />
+  <arg name="max_velocity" default="1.5" />
+  <arg name="max_acceleration" default="2.0" />
+  <arg name="planning_horizon" default="6.0" />
+
+  <group if="$(arg start_vio)">
+    <include file="$(find slam_practice)/launch/task2_airsim_vins.launch">
+      <arg name="host" value="$(arg host)" />
+      <arg name="rviz" value="false" />
+    </include>
+  </group>
+
+  <node pkg="slam_practice" type="depth_pose_adapter.py" name="depth_pose_adapter" output="screen" required="true">
+    <param name="depth_input" value="/airsim_node/Drone1/left/DepthPlanner" />
+    <param name="odometry_input" value="/slam_practice/vins/odometry" />
+    <param name="depth_output" value="/ego_bridge/depth" />
+    <param name="pose_output" value="/ego_bridge/camera_pose" />
+    <param name="pose_tolerance" value="0.10" />
+    <rosparam param="body_to_camera_translation">[0.0, 0.1, 0.0]</rosparam>
+  </node>
+
+  <!-- 仅包含 EGO 主参数/节点，不启动上游自带仿真环境。 -->
+  <include file="$(find ego_planner)/launch/advanced_param.xml">
+    <arg name="map_size_x_" value="$(arg map_size_x)" />
+    <arg name="map_size_y_" value="$(arg map_size_y)" />
+    <arg name="map_size_z_" value="$(arg map_size_z)" />
+    <arg name="odometry_topic" value="/slam_practice/vins/odometry" />
+    <arg name="camera_pose_topic" value="/ego_bridge/camera_pose" />
+    <arg name="depth_topic" value="/ego_bridge/depth" />
+    <arg name="cloud_topic" value="/ego_bridge/unused_cloud" />
+    <arg name="cx" value="320.0" />
+    <arg name="cy" value="240.0" />
+    <arg name="fx" value="320.0" />
+    <arg name="fy" value="320.0" />
+    <arg name="max_vel" value="$(arg max_velocity)" />
+    <arg name="max_acc" value="$(arg max_acceleration)" />
+    <arg name="planning_horizon" value="$(arg planning_horizon)" />
+    <arg name="flight_type" value="1" />
+    <arg name="point_num" value="1" />
+    <arg name="point0_x" value="0.0" />
+    <arg name="point0_y" value="0.0" />
+    <arg name="point0_z" value="1.5" />
+    <arg name="point1_x" value="0.0" />
+    <arg name="point1_y" value="0.0" />
+    <arg name="point1_z" value="1.5" />
+    <arg name="point2_x" value="0.0" />
+    <arg name="point2_y" value="0.0" />
+    <arg name="point2_z" value="1.5" />
+    <arg name="point3_x" value="0.0" />
+    <arg name="point3_y" value="0.0" />
+    <arg name="point3_z" value="1.5" />
+    <arg name="point4_x" value="0.0" />
+    <arg name="point4_y" value="0.0" />
+    <arg name="point4_z" value="1.5" />
+  </include>
+
+  <node pkg="ego_planner" type="traj_server" name="traj_server" output="screen" required="true">
+    <remap from="/position_cmd" to="/planning/pos_cmd" />
+    <remap from="/odom_world" to="/slam_practice/vins/odometry" />
+    <param name="traj_server/time_forward" value="1.0" type="double" />
+  </node>
+
+  <node pkg="waypoint_generator" type="waypoint_generator" name="waypoint_generator" output="screen">
+    <remap from="~odom" to="/slam_practice/vins/odometry" />
+    <remap from="~goal" to="/move_base_simple/goal" />
+    <remap from="~traj_start_trigger" to="/traj_start_trigger" />
+    <param name="waypoint_type" value="manual-lonely-waypoint" />
+  </node>
+
+  <node pkg="slam_practice" type="ego_position_controller.py" name="ego_position_controller" output="screen" required="true">
+    <param name="odometry_topic" value="/slam_practice/vins/odometry" />
+    <param name="command_topic" value="/planning/pos_cmd" />
+    <param name="output_topic" value="/airsim_node/vel_cmd_world_frame" />
+    <param name="kp" value="0.8" />
+    <param name="max_xy_speed" value="1.5" />
+    <param name="max_z_speed" value="0.8" />
+    <param name="watchdog_timeout" value="0.25" />
+  </node>
+
+  <node if="$(arg rviz)" pkg="rviz" type="rviz" name="rviz_ego" args="-d $(find slam_practice)/rviz/task2_ego.rviz" output="screen" />
+</launch>

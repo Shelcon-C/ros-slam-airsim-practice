@@ -1,0 +1,19 @@
+<launch>
+  <!-- Windows 主机运行 AirSim、WSL2 运行 ROS 时：export WSL_HOST_IP=$(awk '/nameserver/{print $2; exit}' /etc/resolv.conf) -->
+  <arg name="host" default="$(optenv WSL_HOST_IP 127.0.0.1)" />
+  <arg name="is_vulkan" default="false" />
+
+  <node name="airsim_node" pkg="airsim_ros_pkgs" type="airsim_node" output="screen" required="true">
+    <param name="is_vulkan" value="$(arg is_vulkan)" />
+    <param name="host_ip" value="$(arg host)" />
+    <param name="host_port" value="41451" />
+    <param name="update_airsim_control_every_n_sec" value="0.01" />
+    <param name="update_airsim_img_response_every_n_sec" value="0.05" />
+    <param name="publish_clock" value="false" />
+    <param name="world_frame_id" value="world_enu" />
+    <param name="odom_frame_id" value="odom_local_enu" />
+    <param name="coordinate_system_enu" value="true" />
+  </node>
+
+  <include file="$(find airsim_ros_pkgs)/launch/static_transforms.launch" />
+</launch>

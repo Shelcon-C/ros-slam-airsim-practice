@@ -1,0 +1,44 @@
+<launch>
+  <arg name="dataset_root" default="$(env HOME)/datasets/euroc/MH_01_easy"/>
+  <arg name="camera_yaml" default="$(find slam_practice)/config/camera/euroc_cam0.yaml"/>
+  <arg name="orb_settings" default="$(find slam_practice)/config/orbslam3/euroc_mono.yaml"/>
+  <arg name="vocabulary_path" default="$(env HOME)/third_party/ORB_SLAM3/Vocabulary/ORBvoc.txt"/>
+  <arg name="use_viewer" default="true"/>
+  <arg name="rviz" default="true"/>
+  <arg name="playback_rate" default="1.0"/>
+  <arg name="start_offset" default="0.0"/>
+  <arg name="duration" default="0.0"/>
+  <arg name="subscriber_timeout" default="60.0"/>
+  <arg name="trajectory_output" default="$(env HOME)/slam_results/task1/orbslam3_mh01.tum"/>
+  <arg name="keyframe_output" default="$(env HOME)/slam_results/task1/orbslam3_mh01_keyframes.tum"/>
+
+  <node pkg="orbslam3_ros" type="orbslam3_mono_node" name="orbslam3_mono" output="screen">
+    <param name="vocabulary_path" value="$(arg vocabulary_path)"/>
+    <param name="settings_path" value="$(arg orb_settings)"/>
+    <param name="image_topic" value="/camera/mono/image_raw"/>
+    <param name="world_frame" value="map"/>
+    <param name="camera_frame" value="camera_mono_optical_frame"/>
+    <param name="use_viewer" value="$(arg use_viewer)"/>
+    <param name="keyframe_trajectory" value="$(arg keyframe_output)"/>
+  </node>
+
+  <node pkg="slam_practice" type="trajectory_recorder.py" name="orbslam3_trajectory_recorder" output="screen">
+    <param name="input_topic" value="/orbslam3/pose"/>
+    <param name="message_type" value="pose"/>
+    <param name="output_path" value="$(arg trajectory_output)"/>
+  </node>
+
+  <node pkg="rviz" type="rviz" name="task1_rviz" if="$(arg rviz)"
+        args="-d $(find slam_practice)/rviz/task1_orbslam3.rviz" output="screen"/>
+
+  <!-- 放在最后便于订阅端先启动，发布端会等待 ROS 调度后再开始顺序播放。 -->
+  <node pkg="slam_practice" type="euroc_mono_publisher.py" name="euroc_mono_publisher" output="screen">
+    <param name="dataset_root" value="$(arg dataset_root)"/>
+    <param name="camera_yaml" value="$(arg camera_yaml)"/>
+    <param name="playback_rate" value="$(arg playback_rate)"/>
+    <param name="start_offset" value="$(arg start_offset)"/>
+    <param name="duration" value="$(arg duration)"/>
+    <param name="wait_for_subscriber" value="true"/>
+    <param name="subscriber_timeout" value="$(arg subscriber_timeout)"/>
+  </node>
+</launch>

@@ -1,0 +1,59 @@
+%YAML:1.0
+---
+
+# 输入只使用桥接节点规范化后的 Topic；AirSim 真值不进入估计算法。
+imu: 1
+num_of_cam: 2
+imu_topic: "/vins_fusion/imu"
+image0_topic: "/vins_fusion/cam0/image_raw"
+image1_topic: "/vins_fusion/cam1/image_raw"
+output_path: "/tmp/vins_fusion"
+
+cam0_calib: "airsim_cam0.yaml"
+cam1_calib: "airsim_cam1.yaml"
+image_width: 640
+image_height: 480
+
+# AirSim settings 中基线为 0.20 m。Wrapper 使用 ENU/FLU 后，左相机位于
+# body +Y，右相机位于 body -Y；相机坐标采用光学系 x右/y下/z前。
+estimate_extrinsic: 0
+body_T_cam0: !!opencv-matrix
+   rows: 4
+   cols: 4
+   dt: d
+   data: [ 0.0,  0.0,  1.0,  0.0,
+          -1.0,  0.0,  0.0,  0.1,
+           0.0, -1.0,  0.0,  0.0,
+           0.0,  0.0,  0.0,  1.0 ]
+body_T_cam1: !!opencv-matrix
+   rows: 4
+   cols: 4
+   dt: d
+   data: [ 0.0,  0.0,  1.0,  0.0,
+          -1.0,  0.0,  0.0, -0.1,
+           0.0, -1.0,  0.0,  0.0,
+           0.0,  0.0,  0.0,  1.0 ]
+
+multiple_thread: 1
+max_cnt: 150
+min_dist: 30
+freq: 20
+F_threshold: 1.0
+show_track: 1
+flow_back: 1
+
+max_solver_time: 0.04
+max_num_iterations: 8
+keyframe_parallax: 10.0
+
+acc_n: 0.08
+gyr_n: 0.004
+acc_w: 0.00004
+gyr_w: 0.000002
+g_norm: 9.81007
+
+estimate_td: 0
+td: 0.0
+load_previous_pose_graph: 0
+pose_graph_save_path: "/tmp/vins_fusion/pose_graph"
+save_image: 0

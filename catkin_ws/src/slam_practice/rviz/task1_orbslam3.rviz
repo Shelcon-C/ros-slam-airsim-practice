@@ -1,0 +1,40 @@
+Panels:
+  - Class: rviz/Displays
+    Name: Displays
+Visualization Manager:
+  Global Options:
+    Fixed Frame: map
+    Background Color: 32; 32; 32
+    Frame Rate: 30
+  Displays:
+    - Class: rviz/Grid
+      Name: Grid
+      Enabled: true
+      Cell Size: 1
+    - Class: rviz/Path
+      Name: ORB-SLAM3 Path
+      Enabled: true
+      Topic: /orbslam3/path
+      Color: 25; 255; 25
+      Line Width: 0.03
+    - Class: rviz/Pose
+      Name: Camera Pose
+      Enabled: true
+      Topic: /orbslam3/pose
+      Shape: Axes
+    - Class: rviz/PointCloud
+      Name: Tracked Map Points
+      Enabled: true
+      Topic: /orbslam3/tracked_points
+      Style: Points
+      Size (Pixels): 3
+      Color Transformer: FlatColor
+      Color: 255; 200; 50
+    - Class: rviz/Image
+      Name: Monocular Input
+      Enabled: true
+      Image Topic: /camera/mono/image_raw
+      Transport Hint: raw
+Window Geometry:
+  Width: 1280
+  Height: 800

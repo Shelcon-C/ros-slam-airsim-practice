@@ -1,0 +1,28 @@
+.worktrees/
+.venv-evo/
+
+# Catkin build products
+catkin_ws/build/
+catkin_ws/devel/
+catkin_ws/install/
+catkin_ws/logs/
+catkin_ws/src/VINS-Fusion
+catkin_ws/src/ego-planner
+
+# External projects and datasets
+third_party/
+datasets/
+*.bag
+
+# Generated experiment artifacts
+results/
+output/
+*.zip
+*.pdf
+
+# Python and editor caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.idea/
+.vscode/

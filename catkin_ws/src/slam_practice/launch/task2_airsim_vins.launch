@@ -1,0 +1,47 @@
+<launch>
+  <arg name="host" default="$(optenv WSL_HOST_IP 127.0.0.1)" />
+  <arg name="start_airsim_wrapper" default="true" />
+  <arg name="record_trajectories" default="true" />
+  <arg name="rviz" default="true" />
+  <arg name="vins_config" default="$(find slam_practice)/config/vins/airsim_stereo_imu.yaml" />
+  <arg name="estimate_file" default="$(env HOME)/slam_results/task2/vins_estimate.tum" />
+  <arg name="groundtruth_file" default="$(env HOME)/slam_results/task2/airsim_groundtruth.tum" />
+
+  <group if="$(arg start_airsim_wrapper)">
+    <include file="$(find slam_practice)/launch/airsim_noetic_wsl.launch">
+      <arg name="host" value="$(arg host)" />
+    </include>
+  </group>
+
+  <node pkg="slam_practice" type="stereo_imu_relay.py" name="stereo_imu_relay" output="screen" required="true">
+    <param name="left_input" value="/airsim_node/Drone1/left/Scene" />
+    <param name="right_input" value="/airsim_node/Drone1/right/Scene" />
+    <param name="imu_input" value="/airsim_node/Drone1/imu/Imu" />
+    <param name="left_output" value="/vins_fusion/cam0/image_raw" />
+    <param name="right_output" value="/vins_fusion/cam1/image_raw" />
+    <param name="imu_output" value="/vins_fusion/imu" />
+  </node>
+
+  <!-- VINS-Fusion 使用私有 NodeHandle，固定节点名可稳定得到 /vins_estimator/* 输出。 -->
+  <node pkg="vins" type="vins_node" name="vins_estimator" args="$(arg vins_config)" output="screen" required="true" />
+
+  <node pkg="slam_practice" type="vins_output_adapter.py" name="vins_output_adapter" output="screen">
+    <param name="input_topic" value="/vins_estimator/odometry" />
+    <param name="world_frame" value="world" />
+    <param name="body_frame" value="body" />
+  </node>
+
+  <group if="$(arg record_trajectories)">
+    <node pkg="slam_practice" type="trajectory_recorder.py" name="vins_trajectory_recorder" output="screen">
+      <param name="input_topic" value="/slam_practice/vins/odometry" />
+      <param name="message_type" value="odometry" />
+      <param name="output_path" value="$(arg estimate_file)" />
+    </node>
+    <node pkg="slam_practice" type="airsim_gt_recorder.py" name="airsim_gt_recorder" output="screen">
+      <param name="input_topic" value="/airsim_node/Drone1/odom_local_enu" />
+      <param name="output_path" value="$(arg groundtruth_file)" />
+    </node>
+  </group>
+
+  <node if="$(arg rviz)" pkg="rviz" type="rviz" name="rviz" args="-d $(find slam_practice)/rviz/task2_vins.rviz" output="screen" />
+</launch>
